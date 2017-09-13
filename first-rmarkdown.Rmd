@@ -1,0 +1,60 @@
+---
+title: "First example on using RMarkdown"
+author: Per Møldrup-Dalum (PMD)
+date: 12 September 2017
+output: html_document
+---
+
+## Introduction
+
+When writing R code it is very convinient to use RMarkdown[^1] created by RStudio. It enables you to combine prose and code and provides very flexible export to multiple format, e.g. HTML, PDF, docx. The easiest way to use RMarkdown is by working in the RStudio IDE, either the desktop client or the web browser based server version. The former can be installed as described at the RStudio homepage[^2].
+
+This small tutorial will describe how to use it outside of RStudio and thereby explain a bit about what goes on behind the scene, i.e. RStudio.
+
+## Load needed packages
+
+RMarkdown is a variant of Markdown that facilitates literate programming[^3] as defined by Donald Knuth. In literate programming, the documentation and the code is contained within the same file. You then weave this file to get separate documentation and code. In RMarkdown this is called knitting and it is implemented in the `knitr` package by Yihui Xie[^4].
+
+Alas, let's go. First install the needed packages
+
+```{r}
+install.packages("knitr")
+install.packages("rmarkdown")
+```
+
+Load the goodies
+
+```{r}
+library(knitr)
+library(rmarkdown)
+```
+
+## Render a Rmarkdown file as something else
+
+In this project we have a small RMarkdown file: `test-rmarkdown.Rmd`. To create a HTML version of that file, we simply execute
+
+```{r}
+render("test-rmarkdown.Rmd")
+```
+
+This function creates an HTML document in the working directory because in the header of `test-rmarkdown.Rmd` file, we have the following
+
+```
+...
+output: html_document
+---
+```
+
+If we wanted another format, we would just tell the `render`function which:
+
+```{r}
+render("test-rmarkdown.Rmd", output_format = "pdf_document")
+```
+
+or even a Word document
+
+```{r}
+render("test-rmarkdown.Rmd", output_format = "word_document")
+```
+
+And that's it...

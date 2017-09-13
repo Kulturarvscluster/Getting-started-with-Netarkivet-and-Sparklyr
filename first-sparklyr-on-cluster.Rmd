@@ -1,0 +1,10 @@
+---
+title: "First small steps with sparklyr on the Kulturarvscluster"
+author: Per Møldrup-Dalum (PMD)
+date: 13 September 2017
+output: html_document
+---
+
+## Introduction
+
+To be written...

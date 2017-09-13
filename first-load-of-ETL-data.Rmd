@@ -1,0 +1,79 @@
+---
+title: "Learn to load CSV files from Netarkivet-ETL into Spark via Sparklyr"
+output: html_document
+---
+
+## Introduction
+
+In this snort introduction we will learn to load data extracted from the Danish Netarchive into Spark.
+
+Load the nessecary libraries. Sparklyr is explained in `first-sparklyr.Rmd`. The `tidyverse`[^2] library is a super library that includes very many great R libraries created by primarily Hadley Wickham[^1] from RStudio.
+
+Remember to install `tidyverse` if you haven't done so already.
+
+```{r}
+library(sparklyr)
+library(tidyverse)
+```
+
+## Get some test data
+
+We get some test data from here: 
+
+
+## Set-up a Spark context for this tutorial
+
+Create a local Spark context as described in `first-sparklyr.Rmd`
+
+```{r}
+sc <- spark_connect(master = "local")
+```
+
+I then need at small test CSV file, which will be the first 5,000 lines of the 5 million lines fodbold-corpus file created in the `first-extract-of-metadata.Rmd` tutorial.
+
+In order to read the crawl.log data into a understandabale table, we provide column names from TODO: insert URL 
+
+```{r}
+column_names <- c("jobid", "timestamp", "fetch_status_code", "size", "uri", "discovery_path", "referrer", "mime", "worker_thread_id", "fetch_timestamp", "sha1", "src_tag", "annotations")
+
+```
+
+
+```{r}
+small_crawl_path <- "data/crawl-5000.log"
+tbl <- spark_read_csv(sc,"small_crawl", small_crawl_path,
+                      header = FALSE,
+                      columns = column_names,
+                      infer_schema = TRUE,
+                      delimiter = "\t",
+                      charset = "UTF-8",
+                      null_value = NA,
+                      overwrite = TRUE)
+```
+
+Did we actually get the file loaded? `src_tbls(`<Spark context>`)` lists the data frames within a Spark context.
+
+```{r}
+src_tbls(sc)
+```
+
+Let's have a look at the Spark data frame
+
+```{r}
+head(tbl)
+```
+
+Oh yes!
+
+Then let's try to dplyr it a bit
+
+
+```{r}
+tbl %>%
+    filter(fetch_status_code == 200)
+```
+
+
+[^1]: http://hadley.nz
+
+[^2]: http://www.tidyverse.org
