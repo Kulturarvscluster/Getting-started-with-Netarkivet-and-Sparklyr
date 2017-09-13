@@ -1,0 +1,8 @@
+/.DS_Store
+bin
+data
+/derby.log
+figure
+/fodbold-input
+fodbold
+/log4j.spark.log
