@@ -7,4 +7,92 @@ output: html_document
 
 ## Introduction
 
-To be written...
+To follow this tutorial you need to have the Github project cloned or extracted on the DeIC National Cultural Heritage Cluster, Royal Danish Library[^1] (Kulturarvscluster).
+
+A minimal example on how to get startet with Sparklyr. Focus will be on using R and Spark on data from Netarkivet-ETL.
+
+If you have not yet installed Sparklyr, you need to go through the `first-sparklyr.Rmd` tutorial.
+
+You can then load the Sparklye library
+
+```{r}
+library(sparklyr)
+```
+
+We also need the functions from the dplyr library.
+
+```{r}
+library(dplyr)
+```
+
+## Connect to the Spark cluster
+
+When using sparklyr, you can either connect to a local instance of Spark or connect to a remote Spark on a real cluster. In these examples we will focus on submitting jobs to the Kulturarvscluster Spark.
+
+Sparklyr includes a function to install a local Spark. We choose to install Spark in version 2.1.0 using this simple function call
+
+```{r}
+spark_install(version = "2.1.0")
+```
+
+## Test the sparklyr
+
+Let us try to load some data into Spark and then perform a small query. Just to make it a bit interesting, I choose to use the same data set as on the RStudio introduction to sparklyr[^1]. R comnes with quite a large set of data sets, but we'll work with the New York City Flights 2013 dataset which needs to be installed
+
+```{r}
+install.packages("nycflights13")
+library(nycflights13)
+flights
+```
+
+This data set contains 336,776 flights out of New York in 2013.
+
+We need just one more component for this test. If you once have tasted the sweet taste of dplyr, you can never go back——which is not that bad. Alas,
+
+```{r}
+library(dplyr)
+```
+
+Okay, now it's time to create a Spark context
+
+```{r}
+sc <- spark_connect(master = "local")
+```
+Put the flights into Spark
+
+```{r}
+flights_tbl <- copy_to(sc, flights, "flights", overwrite = TRUE)
+src_tbls(sc)
+```
+
+Okay, first let's try a simple query. Let's say we want to look at flights with a departure delayed two hours and group those by day
+
+```{r}
+flights_tbl %>%
+    filter(dep_delay == 2) %>%
+    group_by(month) %>%
+    summarise(n = n()) %>%
+    arrange(month)
+```
+
+Now that we at it, we might as do the same plot that RStudio uses to demonstrate sparklyr
+
+```{r}
+delay <- flights_tbl %>%
+    group_by(tailnum) %>%
+    summarise(count = n(), dist = mean(distance), delay = mean(arr_delay)) %>%
+    filter(count > 20, dist < 2000, !is.na(delay)) %>%
+    collect
+
+library(ggplot2)
+ggplot(delay, aes(dist, delay)) +
+    geom_point(aes(size = count), alpha = 1/2) +
+    geom_smooth() +
+    scale_size_area(max_size = 2)
+```
+And that's it, Folks...
+
+[^1]: https://spark.rstudio.com
+
+
+[^1]: http://kulturarvscluster.dk
