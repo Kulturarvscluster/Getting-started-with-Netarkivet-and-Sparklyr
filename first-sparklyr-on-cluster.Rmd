@@ -27,37 +27,28 @@ library(dplyr)
 
 ## Connect to the Spark cluster
 
-When using sparklyr, you can either connect to a local instance of Spark or connect to a remote Spark on a real cluster. In these examples we will focus on submitting jobs to the Kulturarvscluster Spark.
+When using sparklyr, you can either connect to a local instance of Spark or connect to a remote Spark on a cluster. In these examples we will focus on submitting jobs to the Kulturarvscluster Spark.
 
-Sparklyr includes a function to install a local Spark. We choose to install Spark in version 2.1.0 using this simple function call
+The next two expressions connect this R to the Spark cluster.
 
 ```{r}
-spark_install(version = "2.1.0")
+Sys.setenv(SPARK_HOME='/usr/hdp/current/spark2-client')
+sc <- spark_connect(master = 'yarn-client')
 ```
+
+The `spark_connect` function takes a few seconds, so you need a bit of patience.
 
 ## Test the sparklyr
 
-Let us try to load some data into Spark and then perform a small query. Just to make it a bit interesting, I choose to use the same data set as on the RStudio introduction to sparklyr[^1]. R comnes with quite a large set of data sets, but we'll work with the New York City Flights 2013 dataset which needs to be installed
+Let us try to load some data into Spark and then perform a small query. Just to make it a bit interesting, I choose to use the same data set as on the RStudio introduction to sparklyr[^1]. R comnes with quite a large set of data sets, but we'll work with the New York City Flights 2013 dataset installed in the `first-sparklyr.Rmd` tutorial.
 
 ```{r}
-install.packages("nycflights13")
 library(nycflights13)
 flights
 ```
 
 This data set contains 336,776 flights out of New York in 2013.
 
-We need just one more component for this test. If you once have tasted the sweet taste of dplyr, you can never go back——which is not that bad. Alas,
-
-```{r}
-library(dplyr)
-```
-
-Okay, now it's time to create a Spark context
-
-```{r}
-sc <- spark_connect(master = "local")
-```
 Put the flights into Spark
 
 ```{r}
